@@ -1,0 +1,968 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cotizador de Servicios</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Tipo de fuente para todo el documento */
+            margin: 0; /* Elimina los márgenes predeterminados */
+            padding: 50px 5vw; /* Padding responsivo basado en el ancho de la ventana */
+            padding-bottom: 25px; /* Padding específico para la parte inferior */
+        }
+
+        /* Contenedor principal para los servicios */
+        .contenedor-servicios {
+            display: flex; /* Usa flexbox para el layout */
+            flex-wrap: wrap; /* Permite que los elementos se ajusten y envuelvan según el ancho */
+            justify-content: flex-start; /* Alinea los elementos al inicio del contenedor */
+        }
+
+        /* Estilos para cada servicio individual */
+        .servicio {
+            display: flex;
+            flex-direction: column; /* Organiza los hijos en columna */
+            justify-content: space-between; /* Distribuye espacio entre los elementos internos */
+            margin: 10px; /* Margen alrededor de cada servicio */
+            padding: 25px; /* Padding dentro de cada servicio */
+            width: calc(25% - 20px); /* Ancho calculado para cuatro tarjetas por fila con margen */
+            box-sizing: border-box; /* Incluye padding y border en el cálculo del ancho/altura */
+            border-radius: 10px; /* Bordes redondeados */
+            background-color: #f0f0f0; /* Color de fondo para cada tarjeta de servicio */
+        }
+
+        .categoria{
+            margin-bottom: 50px;
+        }
+
+        /* Estilo para un servicio seleccionado */
+        .servicio.selected {
+            background-color: #e2f8cd; /* Color de fondo para servicios seleccionados */
+        }
+
+        /* Contenedor para los controles dentro de cada servicio */
+        .servicio .controles {
+            display: flex;
+            align-items: center; /* Centra elementos verticalmente */
+            justify-content: space-between; /* Separa elementos a ambos extremos */
+        }
+
+        /* Estilos para selectores y campos de entrada */
+        .servicio .controles select,
+        .servicio .controles .input-cantidad {
+            font-size: 18px; /* Tamaño de fuente para selectores y campos de entrada */
+            border-radius: 5px; /* Bordes redondeados */
+            padding: 10px; /* Padding interno */
+            width: 100%; /* Cambiado de 70% a 100% */
+            background-color: #ffffff;
+            border: none; /* Sin bordes */
+        }
+
+        .servicio .controles .input-cantidad {
+            width: 30%;
+            margin-left: 10px;
+            
+        }
+
+        /* Títulos dentro de cada servicio */
+        .servicio h3 {
+            margin: 0;
+            margin-bottom: 0.5em; /* Margen en la parte inferior del título */
+            font-size: 20px; /* Tamaño de fuente para títulos */
+        }
+
+        /* Estilos para párrafos dentro de servicios (generalmente para precios) */
+        .servicio p {
+            font-size: 19px; /* Tamaño de fuente para texto */
+        }
+        
+        /* Estilos generales para botones */
+        button {
+            margin: 10px; /* Margen alrededor de los botones */
+            padding: 15px 25px; /* Padding interno para botones */
+            border-radius: 8px; /* Bordes redondeados */
+            font-size: 20px; /* Tamaño de fuente */
+            border: none; /* Sin bordes */
+            transition: background-color 0.2s, transform 0.2s; /* Transiciones para color de fondo y transformación */
+            cursor: pointer; /* Cursor en forma de puntero */
+            color: white; /* Color de texto blanco */
+        }
+
+        /* Contenedor para botones */
+        #botones, #botones-resumen {
+            margin: 20px 0; /* Margen vertical para separar del contenido adyacente */
+            text-align: center; /* Alinea botones al centro */
+        }
+
+        .resumen-servicio {
+            background-color: #fff6dc;
+            border-radius: 10px;
+            padding: 10px;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        #continuar {
+            background-color: #73c034;
+            color: white;
+        }
+    
+        #continuar:hover {
+            background-color: #45a049;
+        }
+    
+        #reiniciar {
+            background-color: #ec6259;
+            color: white;
+        }
+    
+        #reiniciar:hover {
+            background-color: #d32f2f;
+        }
+    
+        #volver {
+            background-color: #ffcc80;
+        }
+
+        #volver:hover {
+            background-color: #d4a358;
+        }
+
+        /* Estilos para el resumen de la compra */
+        #resumen-compra {
+            font-size: 20px; /* Tamaño de fuente para el resumen de la compra */
+            width: 100%;
+        }
+
+        .titulo-categoria {
+            font-size: 30px
+        }
+
+        /* Media queries para ajustar estilos en dispositivos de diferentes tamaños */
+
+        @media (max-width: 1450px) {
+            .servicio {
+                width: calc(33.33% - 20px); /* Tres tarjetas por fila */
+            }
+        }
+
+        @media (max-width: 1024px) {
+
+            .servicio {
+                width: calc(50% - 20px); /* Dos tarjetas por fila en pantallas medianas */
+            }
+
+            .titulo-categoria {
+            font-size: 54px
+            }
+
+            .categoria{
+                margin-bottom: 80px;
+            }
+
+            .servicio h3, .servicio p, button {
+                font-size: 38px; /* Ajuste dinámico de tamaño de fuente para elementos en tarjetas */
+            }
+
+            .servicio .controles select,
+            .servicio .controles .input-cantidad {
+                font-size: 30px; /* Ajuste dinámico de tamaño de fuente */
+            }
+
+            #resumen-compra {
+                font-size: 26px; /* Tamaño de fuente ajustado para el resumen en pantallas pequeñas */
+            }
+
+            button {
+                padding: 20px 28px; /* Padding ajustado para botones en pantallas pequeñas */
+                border-radius: 16px;
+            }
+
+            .resumen-servicio {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .servicio {
+                width: 100%; /* Una tarjeta por fila en pantallas pequeñas */
+                margin-bottom: 40px;
+            }
+
+            body {
+                padding: 20px 3vw; /* Padding reducido para pantallas pequeñas */
+            }
+
+            .categoria{
+                margin-bottom: 80px;
+            }
+
+            .titulo-categoria {
+            font-size: 50px
+            }
+
+            .servicio h3, .servicio p, button {
+                font-size: 40px; /* Ajuste dinámico de tamaño de fuente para elementos en tarjetas */
+            }
+
+            .servicio .controles select,
+            .servicio .controles .input-cantidad {
+                font-size: 30px; /* Ajuste dinámico de tamaño de fuente */
+            }
+
+            #resumen-compra {
+                font-size: 30px; /* Tamaño de fuente ajustado para el resumen en pantallas pequeñas */
+            }
+
+            button {
+                padding: 20px 28px; /* Padding ajustado para botones en pantallas pequeñas */
+                border-radius: 16px;
+            }
+        }
+
+
+    </style>
+    
+
+</head>
+<body>
+
+    <div class="categoria">
+        <h1 class="titulo-categoria">Misceláneo</h1>
+        <!-- Contenedor de servicios -->
+        <div class="contenedor-servicios">
+            <div class="servicio" data-precio="450" data-promocion="true">
+                <h3>Media Hora Levantamiento</h3>
+                <p>$450.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="300" data-promocion="true">
+                <h3>Programación de Contenido</h3>
+                <p>$300.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+        </div>
+        <!-- Contenedor de servicios -->
+    </div>
+
+    <div class="categoria">
+        <h1 class="titulo-categoria">Multimedia</h1>
+        <!-- Contenedor de servicios -->
+        <div class="contenedor-servicios">
+            <div class="servicio" data-precio="190" data-promocion="true">
+                <h3>Fotografía de catálogo</h3>
+                <p>$190.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="240" data-promocion="true">
+                <h3>Fotografía Conceptual</h3>
+                <p>$240.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="150" data-promocion="true">
+                <h3>Fotografía general</h3>
+                <p>$150.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="500" data-promocion="true">
+                <h3>Reels/Tiktoks</h3>
+                <p>$500.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="350" data-promocion="true">
+                <h3>Animación</h3>
+                <p>$350.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="1500" data-promocion="true">
+                <h3>Edición de vídeo</h3>
+                <p>$1500.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+        </div>
+        <!-- Contenedor de servicios -->
+    </div>
+
+    <div class="categoria">
+        <h1 class="titulo-categoria">Diseño</h1>
+        <!-- Contenedor de servicios -->
+        <div class="contenedor-servicios">
+            <div class="servicio" data-precio="4000" data-promocion="true">
+                <h3>Identidad Corporativa Básica</h3>
+                <p>$4000.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="8000" data-promocion="true">
+                <h3>Identidad Corporativa Extendida</h3>
+                <p>$8000.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="150" data-promocion="true">
+                <h3>Diseños - Historias Individuales</h3>
+                <p>$150.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="3000" data-promocion="true">
+                <h3>Diseño de Menú</h3>
+                <p>$3000.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="500" data-promocion="true">
+                <h3>Diseño Tarjetas de Presentación</h3>
+                <p>$500.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+            
+            <div class="servicio" data-precio="450" data-promocion="true">
+                <h3>Vestidura de Redes Sociales</h3>
+                <p>$450.00</p>
+                <div class="controles">
+                    <select class="cantidad">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21_custom">Otra cantidad</option>
+                    </select>
+                    <input type="number" class="input-cantidad" style="display: none;" min="0" max="1000">
+                </div>
+            </div>
+        </div>
+        <!-- Contenedor de servicios -->
+    </div>
+
+    <div id="resumen-compra" style="display:none;"></div>
+
+    <div id="botones">
+        <button id="continuar">Continuar</button>
+        <button id="reiniciar">Reiniciar</button>
+    </div>
+    
+    <div id="botones-resumen" style="display:none;">
+        
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botonContinuar = document.getElementById('continuar');
+            const botonReiniciar = document.getElementById('reiniciar');
+            const contenedoresServicios = document.querySelectorAll('.contenedor-servicios');
+            const resumenCompra = document.getElementById('resumen-compra');
+            const botonesResumen = document.getElementById('botones-resumen');
+
+            let servicioGlobalIndex = 0;  // Índice global para todos los servicios
+
+            document.querySelectorAll('.servicio').forEach((servicio, index) => {
+                servicio.setAttribute('data-index', servicioGlobalIndex++);
+                const select = servicio.querySelector('.cantidad');
+                const valorGuardado = localStorage.getItem('servicio_' + servicio.getAttribute('data-index'));
+
+                if (valorGuardado && valorGuardado !== '0') {
+                    servicio.classList.add('selected');
+                }
+
+                select.addEventListener('change', function() {
+                    if (this.value !== '0') {
+                        servicio.classList.add('selected');
+                    } else {
+                        servicio.classList.remove('selected');
+                    }
+                    localStorage.setItem('servicio_' + servicio.getAttribute('data-index'), this.value);
+                });
+            });
+
+            contenedoresServicios.forEach((contenedor, contenedorIndex) => {
+                const servicios = contenedor.querySelectorAll('.servicio');
+
+                servicios.forEach(servicio => {
+                    const servicioId = 'servicio_' + servicio.getAttribute('data-index');
+                    const select = servicio.querySelector('.cantidad');
+                    let input = servicio.querySelector('.input-cantidad');
+
+                    if (!input) {
+                        input = document.createElement('input');
+                        input.type = 'number';
+                        input.classList.add('input-cantidad');
+                        input.style.width = '50px';
+                        input.style.display = 'none';
+                        input.min = 0;
+                        input.max = 1000;
+                        servicio.appendChild(input);
+                    }
+
+                    select.addEventListener('change', function() {
+                        if (this.value === '21_custom') {
+                            input.style.display = 'inline-block';
+                            input.focus();
+                            select.style.width = '100%';
+                        } else {
+                            input.style.display = 'none';
+                            select.style.width = '100%';
+                        }
+                        localStorage.setItem(servicioId, this.value);
+                    });
+
+
+                    input.addEventListener('blur', () => {
+                        const num = parseInt(input.value);
+                        if (!isNaN(num) && num >= 0 && num <= 1000) {
+                            const optionExists = [...select.options].some(option => option.value === num.toString());
+                            if (optionExists) {
+                                select.value = num.toString();
+                                input.style.display = 'none';
+                                select.style.width = '100%';
+                                localStorage.setItem(servicioId, num.toString());
+                                if (num === 0) {
+                                    servicio.classList.remove('selected');
+                                }
+                            } else {
+                                localStorage.setItem(servicioId + '_custom', input.value);
+                            }
+                        } else if (input.value.trim() === '') {
+                            select.value = '0';
+                            input.style.display = 'none';
+                            select.style.width = '100%';
+                            localStorage.setItem(servicioId, '0');
+                            servicio.classList.remove('selected');
+                        }
+                    });
+
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            input.blur();
+                        }
+                    });
+        
+
+                    const valorGuardado = localStorage.getItem(servicioId);
+                    if (valorGuardado) {
+                        select.value = valorGuardado;
+                        if (valorGuardado === '21_custom') {
+                            input.style.display = 'inline-block';
+                            const valorGuardadoCustom = localStorage.getItem(servicioId + '_custom');
+                            input.value = valorGuardadoCustom || '';
+                        } else {
+                            input.style.display = 'none';
+                        }
+                        select.style.width = '100%'; // Asegurar que select esté al 100% al cargar
+                        if (valorGuardado !== '0') {
+                            servicio.classList.add('selected');
+                        } else {
+                            servicio.classList.remove('selected');
+                        }
+                    }
+                });
+            });
+
+            function guardarSelecciones() {
+                document.querySelectorAll('.servicio').forEach(servicio => {
+                    const servicioId = 'servicio_' + servicio.getAttribute('data-index');
+                    const select = servicio.querySelector('.cantidad');
+                    const input = servicio.querySelector('.input-cantidad');
+                    localStorage.setItem(servicioId, select.value);
+                });
+            }
+
+            botonContinuar.addEventListener('click', () => {
+                guardarSelecciones();
+                localStorage.setItem('estadoPagina', 'resumen');
+                calcularResumen();
+            });
+
+            botonReiniciar.addEventListener('click', () => {
+                if (confirm("Esto reiniciará el cotizador, borrando todas las selecciones actuales. ¿Deseas continuar?")) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            });
+
+            const estadoPagina = localStorage.getItem('estadoPagina');
+            if (estadoPagina === 'resumen') {
+                mostrarResumen();
+            } else {
+                cargarSelecciones();
+            }
+
+            function calcularResumen() {
+                let total = 0;
+                let resumenHtml = "<h2>Resumen de Compra</h2>";
+                contenedoresServicios.forEach(contenedor => contenedor.style.display = 'none');
+
+                const categorias = document.querySelectorAll('.categoria'); // Selecciona todos los contenedores de categorías
+                categorias.forEach(categoria => categoria.style.display = 'none'); // Oculta cada contenedor de categoría
+
+                const tituloc = document.querySelectorAll('.titulo-categoria'); // Selecciona todos los contenedores de categorías
+                tituloc.forEach(titulo => titulo.style.display = 'none'); // Oculta cada contenedor de categoría
+
+                const formatter = new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                });
+
+                document.querySelectorAll('.servicio').forEach(servicio => {
+                    const servicioId = 'servicio_' + servicio.getAttribute('data-index');
+                    const select = servicio.querySelector('.cantidad');
+                    const input = servicio.querySelector('.input-cantidad');
+                    let cantidad = select.value === '21_custom' ? parseInt(localStorage.getItem(servicioId + '_custom') || 0) : parseInt(select.value);
+                    const precio = parseInt(servicio.dataset.precio);
+                    const nombre = servicio.querySelector('h3').textContent;
+                    const tienePromocion = servicio.dataset.promocion === "true";
+
+                    let subtotal = 0;
+                    if (cantidad > 0) {
+                        if (tienePromocion && cantidad > 10) {
+                            const cantidadSinDescuento = 10;
+                            const cantidadConDescuento = cantidad - 10;
+                            const precioConDescuento = precio * 0.75;
+                            subtotal = (cantidadSinDescuento * precio) + (cantidadConDescuento * precioConDescuento);
+                            resumenHtml += `<div class="resumen-servicio"><p>${nombre} (${formatter.format(precio)} c/u) x ${cantidadSinDescuento} = <strong>${formatter.format(cantidadSinDescuento * precio)}</strong></p>`;
+                            resumenHtml += `<p>${nombre} (${formatter.format(precioConDescuento)} c/u con descuento) x ${cantidadConDescuento} = <strong>${formatter.format(cantidadConDescuento * precioConDescuento)}</strong></p></div>`;
+                        } else {
+                            subtotal = cantidad * precio;
+                            resumenHtml += `<div class="resumen-servicio"><p>${nombre} (${formatter.format(precio)} c/u) x ${cantidad} = <strong>${formatter.format(subtotal)}</strong></p></div>`;
+                        }
+                        total += subtotal;
+                    }
+                });
+
+                const iva = total * 0.16;
+                const totalConIVA = total + iva;
+
+                resumenHtml += `<h4>Subtotal: ${formatter.format(total)} MXN</h3>`;
+                resumenHtml += `<p>IVA (16%): ${formatter.format(iva)} MXN</p>`;
+                resumenHtml += `<h3>Total con IVA: ${formatter.format(totalConIVA)} MXN</h3>`;
+
+                localStorage.setItem('resumenHtml', resumenHtml);
+
+                resumenCompra.innerHTML = resumenHtml;
+                botonContinuar.style.display = 'none';
+                resumenCompra.style.display = 'inline-block';
+
+                botonesResumen.innerHTML = '<button id="volver">Atrás</button>';
+                const volverBtn = document.getElementById('volver');
+                volverBtn.addEventListener('click', () => {
+                    localStorage.removeItem('estadoPagina');
+                    location.reload();
+                });
+
+                botonesResumen.appendChild(botonReiniciar);
+                botonesResumen.style.display = 'block';
+            }
+
+            function mostrarResumen() {
+                const resumenHtml = localStorage.getItem('resumenHtml');
+                
+                const categorias = document.querySelectorAll('.categoria'); // Selecciona todos los contenedores de categorías
+                categorias.forEach(categoria => categoria.style.display = 'none'); // Oculta cada contenedor de categoría
+
+                contenedoresServicios.forEach(contenedor => contenedor.style.display = 'none');
+                resumenCompra.innerHTML = resumenHtml || "<p>No hay datos de resumen disponibles.</p>";
+                botonContinuar.style.display = 'none';
+                resumenCompra.style.display = 'inline-block';
+
+                botonesResumen.innerHTML = '<button id="volver">Atrás</button>';
+                const volverBtn = document.getElementById('volver');
+                volverBtn.addEventListener('click', () => {
+                    localStorage.removeItem('estadoPagina');
+                    location.reload();
+                });
+
+                botonesResumen.appendChild(botonReiniciar);
+                botonesResumen.style.display = 'block';
+            }
+
+            function cargarSelecciones() {
+                const tituloc = document.querySelectorAll('.titulo-categoria'); // Selecciona todos los contenedores de categorías
+                tituloc.forEach(titulo => titulo.style.display = 'block'); // Oculta cada contenedor de categoría
+
+                document.querySelectorAll('.servicio').forEach(servicio => {
+                    const servicioId = 'servicio_' + servicio.getAttribute('data-index');
+                    const select = servicio.querySelector('.cantidad');
+                    const input = servicio.querySelector('.input-cantidad');
+                    const valorGuardado = localStorage.getItem(servicioId);
+                    const valorPersonalizado = localStorage.getItem(servicioId + '_custom');
+
+                    if (valorGuardado) {
+                        select.value = valorGuardado;
+                        if (valorGuardado === '21_custom') {
+                            input.style.display = 'inline-block';
+                            input.value = valorPersonalizado || '';
+                        } else {
+                            input.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
